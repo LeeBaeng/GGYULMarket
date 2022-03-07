@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.leebaeng.ggyulmarket.chatlist.ChatListFragment
 import com.leebaeng.ggyulmarket.home.HomeFragment
+import com.leebaeng.ggyulmarket.login.LoginFragment
 import com.leebaeng.ggyulmarket.mypage.MyPageFragment
 
 class MainActivity : AppCompatActivity() {
@@ -14,17 +15,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val homefragment = HomeFragment()
+        val homeFragment = HomeFragment()
         val chatListFragment = ChatListFragment()
         val myPageFragment = MyPageFragment()
+        val loginFragment = LoginFragment()
 
-        replaceFragment(homefragment)
+        replaceFragment(loginFragment)
 
         val bottomNavView = findViewById<BottomNavigationView>(R.id.navViewBottom)
         bottomNavView.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.home -> {
-                    replaceFragment(homefragment)
+                    replaceFragment(homeFragment)
                     return@setOnItemSelectedListener true
                 }
                 R.id.chatList -> {
