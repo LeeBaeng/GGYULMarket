@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "283622494850",
+    "firebase_url": "https://ggyulmarket-default-rtdb.firebaseio.com",
+    "project_id": "ggyulmarket",
+    "storage_bucket": "ggyulmarket.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:283622494850:android:d3ccf789b2e6c6b4915a9b",
+        "android_client_info": {
+          "package_name": "com.leebaeng.ggyulmarket"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "283622494850-ujbudl2748m37e4ce2jn32fthgl38ddd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDN-WUl-djvO7oocw76mcNuU2kyWHCGVPo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "283622494850-ujbudl2748m37e4ce2jn32fthgl38ddd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
