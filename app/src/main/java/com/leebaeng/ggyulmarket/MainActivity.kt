@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.leebaeng.ggyulmarket.chatlist.ChatListFragment
 import com.leebaeng.ggyulmarket.home.HomeFragment
 import com.leebaeng.ggyulmarket.login.LoginFragment
@@ -20,7 +22,7 @@ class MainActivity : AppCompatActivity() {
         val myPageFragment = MyPageFragment()
         val loginFragment = LoginFragment()
 
-        replaceFragment(loginFragment)
+        replaceFragment(homeFragment)
 
         val bottomNavView = findViewById<BottomNavigationView>(R.id.navViewBottom)
         bottomNavView.setOnItemSelectedListener {
@@ -41,6 +43,7 @@ class MainActivity : AppCompatActivity() {
             return@setOnItemSelectedListener false
         }
 
+        Firebase.database.reference.child("Users").child("ID")
     }
 
     private fun replaceFragment(fragment: Fragment) {
