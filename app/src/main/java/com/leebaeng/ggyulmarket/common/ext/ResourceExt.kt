@@ -30,5 +30,5 @@ fun Float.spToPx(context : Context): Int {
  * @param dpi : default = mdpi. ldpi(120), mdpi(160), hdpi(240), xhdpi(320), xxhdpi(480), xxxhdpi(640)
  */
 fun Number.pxToDp(context: Context, dpi: Int = DisplayMetrics.DENSITY_DEFAULT): Float {
-    return this.toInt() / (context.resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
+    return this.toInt() / (context.resources.displayMetrics.densityDpi.toFloat() / dpi)
 }
