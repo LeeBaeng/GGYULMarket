@@ -13,8 +13,8 @@ fun Date.getTimeGapFormatString(): String {
     val minutes = mills / 1_000 / 60
     val hours = minutes / 60
 
-    if (hours < 1) return String.format("%d분 전", minutes)
-    if (hours < 24) return String.format("%d시간 전", hours)
+    if (mills > 0 && hours < 1) return String.format("%d분 전", minutes)
+    if (mills > 0 && hours < 24) return String.format("%d시간 전", hours)
 
     return SimpleDateFormat("yyyy년 MM월 dd일").format(this)
 }
