@@ -1,7 +1,7 @@
 package com.leebaeng.ggyulmarket
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.ktx.database
@@ -10,6 +10,7 @@ import com.leebaeng.ggyulmarket.chatlist.ChatListFragment
 import com.leebaeng.ggyulmarket.home.HomeFragment
 import com.leebaeng.ggyulmarket.login.LoginFragment
 import com.leebaeng.ggyulmarket.mypage.MyPageFragment
+import com.leebaeng.util.log.LLog
 
 class MainActivity : AppCompatActivity() {
 

@@ -25,25 +25,25 @@ class MarketListAdapter : ListAdapter<MarketModel, MarketListAdapter.ViewHolder>
         holder.bindData(currentList[position])
     }
 
-    inner class ViewHolder(private val binding : ItemMarketBinding) : RecyclerView.ViewHolder(binding.root){
-        fun bindData(model:MarketModel){
+    inner class ViewHolder(private val binding: ItemMarketBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bindData(model: MarketModel) {
 
             binding.txtTitle.text = model.title
             binding.txtDate.text = Date(model.createdAt).getTimeGapFormatString()
             binding.txtPrice.text = model.price.getPriceDotFormatWithWon()
 
-            fun setSubInfo(layout: ViewGroup, txtView: TextView, data: Int?){
-                layout.isVisible = if(data != null && data > 0){
+            fun setSubInfo(layout: ViewGroup, txtView: TextView, data: Int?) {
+                layout.isVisible = if (data != null && data > 0) {
                     txtView.text = data.toString()
                     true
-                }else false
+                } else false
             }
 
             setSubInfo(binding.layoutTalkCount, binding.txtTalkCount, model.talkCnt)
             setSubInfo(binding.layoutLikeCount, binding.txtLikeCount, model.likeCnt)
 
 
-            if(!model.imgUrl.isNullOrEmpty()){
+            if (!model.imgUrl.isNullOrEmpty()) {
                 Glide.with(binding.root)
                     .load(model.imgUrl)
                     .transform(CenterCrop(), RoundedCorners(10f.dpToPx(binding.root.context)))
@@ -52,8 +52,8 @@ class MarketListAdapter : ListAdapter<MarketModel, MarketListAdapter.ViewHolder>
         }
     }
 
-    companion object{
-        val diffUtil = object : DiffUtil.ItemCallback<MarketModel>(){
+    companion object {
+        val diffUtil = object : DiffUtil.ItemCallback<MarketModel>() {
             override fun areItemsTheSame(oldItem: MarketModel, newItem: MarketModel): Boolean {
                 return oldItem == newItem
             }

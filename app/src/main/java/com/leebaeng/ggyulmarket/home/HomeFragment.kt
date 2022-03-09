@@ -1,9 +1,11 @@
 package com.leebaeng.ggyulmarket.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ChildEventListener
@@ -12,14 +14,15 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.leebaeng.ggyulmarket.AddMarketItemActivity
 import com.leebaeng.ggyulmarket.R
 import com.leebaeng.ggyulmarket.common.constants.DBKey
 import com.leebaeng.ggyulmarket.databinding.FragmentHomeBinding
 import com.leebaeng.util.log.LLog
 
-class HomeFragment : Fragment(R.layout.fragment_home){
+class HomeFragment : Fragment(R.layout.fragment_home) {
     private lateinit var binding: FragmentHomeBinding
-    private lateinit var marketListAdapter : MarketListAdapter
+    private lateinit var marketListAdapter: MarketListAdapter
     private lateinit var marketListDB: DatabaseReference
     private lateinit var auth: FirebaseAuth
     private lateinit var dbListener: ChildEventListener
@@ -28,7 +31,6 @@ class HomeFragment : Fragment(R.layout.fragment_home){
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         marketList.clear()
         auth = Firebase.auth
         marketListDB = Firebase.database.reference.child(DBKey.TABLE_MARKET_LIST)
