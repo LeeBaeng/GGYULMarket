@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tool="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="pageTitle"
+            type="String" />
+
+        <variable
+            name="onBackBtnClicked"
+            type="View.OnClickListener" />
+
+        <variable
+            name="onCompleteBtnClicked"
+            type="View.OnClickListener" />
+    </data>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/layoutActionBar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingEnd="15dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:lines="1"
+            android:onClick="@{onBackBtnClicked::onClick}"
+            android:paddingStart="15dp"
+            android:text="◀"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:visibility="@{onBackBtnClicked != null ? View.VISIBLE : View.GONE, default=gone}" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_weight="8"
+            android:ellipsize="end"
+            android:lines="1"
+            android:text="@{pageTitle}"
+            android:textStyle="bold"
+            tool:text="Title" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:lines="1"
+            android:onClick="@{onCompleteBtnClicked::onClick}"
+            android:text="완료"
+            android:visibility="@{onCompleteBtnClicked != null ? View.VISIBLE : View.GONE, default=gone}" />
+
+    </LinearLayout>
+</layout>
