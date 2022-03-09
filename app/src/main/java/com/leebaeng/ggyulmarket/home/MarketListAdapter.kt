@@ -10,8 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.leebaeng.ggyulmarket.R
 import com.leebaeng.ggyulmarket.common.ext.dpToPx
-import com.leebaeng.ggyulmarket.common.ext.getPriceDotFormatWithWon
+import com.leebaeng.ggyulmarket.common.ext.getPriceCommaFormatWithWon
 import com.leebaeng.ggyulmarket.common.ext.getTimeGapFormatString
 import com.leebaeng.ggyulmarket.databinding.ItemMarketBinding
 import java.util.*
@@ -30,7 +31,7 @@ class MarketListAdapter : ListAdapter<MarketModel, MarketListAdapter.ViewHolder>
 
             binding.txtTitle.text = model.title
             binding.txtDate.text = Date(model.createdAt).getTimeGapFormatString()
-            binding.txtPrice.text = model.price.getPriceDotFormatWithWon()
+            binding.txtPrice.text = model.price.getPriceCommaFormatWithWon()
 
             fun setSubInfo(layout: ViewGroup, txtView: TextView, data: Int?) {
                 layout.isVisible = if (data != null && data > 0) {
@@ -42,13 +43,13 @@ class MarketListAdapter : ListAdapter<MarketModel, MarketListAdapter.ViewHolder>
             setSubInfo(binding.layoutTalkCount, binding.txtTalkCount, model.talkCnt)
             setSubInfo(binding.layoutLikeCount, binding.txtLikeCount, model.likeCnt)
 
-
-            if (!model.imgUrl.isNullOrEmpty()) {
+            if (!model.imgUrl.isNullOrEmpty() && model.imgUrl[0].isNotEmpty()) {
                 Glide.with(binding.root)
-                    .load(model.imgUrl)
+                    .load(model.imgUrl[0])
                     .transform(CenterCrop(), RoundedCorners(10f.dpToPx(binding.root.context)))
+                    .placeholder(R.drawable.ic_baseline_shopping_cart_24)
                     .into(binding.imgThumbnail)
-            }
+            } else binding.imgThumbnail.setImageResource(R.drawable.ic_baseline_shopping_cart_24)
         }
     }
 

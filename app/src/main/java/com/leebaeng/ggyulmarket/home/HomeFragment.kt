@@ -73,6 +73,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             } else {
                 startActivity(Intent(requireContext(), AddMarketItemActivity::class.java))
                 Snackbar.make(view, "로그인이 필요 합니다.", Snackbar.LENGTH_SHORT).show()
+                //TODO LoginActivity로 이동
             }
         }
 
