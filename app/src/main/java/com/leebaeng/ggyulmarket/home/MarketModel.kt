@@ -5,7 +5,8 @@ data class MarketModel(
     val title: String = "",
     val createdAt: Long = 0L,
     val price: Int = 0,
-    val imgUrl: String? = null,
+    val description: String = "",
+    val imgUrl: List<String>? = null,
     val talkCnt: Int? = null,
     val likeCnt: Int? = null,
     val id: String = "$sellerId-$createdAt"

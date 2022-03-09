@@ -59,7 +59,7 @@ class MarketListAdapter : ListAdapter<MarketModel, MarketListAdapter.ViewHolder>
             }
 
             override fun areContentsTheSame(oldItem: MarketModel, newItem: MarketModel): Boolean {
-                return oldItem.createdAt == newItem.createdAt && oldItem.sellerId == newItem.sellerId
+                return oldItem.id == newItem.id
             }
         }
     }
