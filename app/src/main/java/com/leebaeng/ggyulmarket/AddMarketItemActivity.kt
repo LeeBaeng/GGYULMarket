@@ -1,7 +1,7 @@
 package com.leebaeng.ggyulmarket
 
 import android.Manifest
-import android.graphics.Color
+import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
@@ -10,6 +10,8 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -17,7 +19,6 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.google.android.material.color.MaterialColors
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
@@ -29,18 +30,23 @@ import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
 import com.gun0912.tedpermission.provider.TedPermissionProvider.context
 import com.leebaeng.ggyulmarket.common.constants.DBKey
-import com.leebaeng.ggyulmarket.common.ext.dpToPx
+import com.leebaeng.ggyulmarket.common.ext.*
 import com.leebaeng.ggyulmarket.databinding.ActivityAddMarketItemBinding
 import com.leebaeng.ggyulmarket.home.MarketModel
 import com.leebaeng.util.log.LLog
+import com.leebaeng.util.log.logW
 import gun0912.tedbottompicker.TedBottomPicker
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class AddMarketItemActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityAddMarketItemBinding
-    private var onCompleteBtnClickListener = View.OnClickListener { reqAddMarketItem() }
-    private var onBackBtnClickListener = View.OnClickListener { Toast.makeText(binding.root.context, "on BackBtn Click!", Toast.LENGTH_SHORT).show() }
+    private var onCompleteBtnClickListener = View.OnClickListener { checkAddMarketItem() }
+    private var onBackBtnClickListener = View.OnClickListener { finish() }
+    private var selectedImgUri = mutableListOf<Uri>()
     private val auth: FirebaseAuth by lazy {
         Firebase.auth
     }
@@ -58,47 +64,110 @@ class AddMarketItemActivity : AppCompatActivity() {
         binding = ActivityAddMarketItemBinding.inflate(layoutInflater)
         binding.onCompleteBtnClickListener = onCompleteBtnClickListener
         binding.onBackBtnClickListener = onBackBtnClickListener
+        binding.edtPrice.setPriceCommaFormat()
         setContentView(binding.root)
 
 //        initImagePickerBySelf()
         initImagePickerByTedBottomPicker()
+        "this is log".logW()
     }
 
-    fun reqAddMarketItem() {
-        Toast.makeText(binding.root.context, "on CompleteBtn Click!", Toast.LENGTH_SHORT).show()
-        val title = binding.edtTitle.text.toString()
-        val price = binding.edtPrice.text.toString().toInt()
-        val description = binding.edtDescription.text.toString()
-        val sellerId = auth.currentUser?.uid.orEmpty()
-        val imgUrlList = mutableListOf<String>().apply {
+    fun checkAddMarketItem() {
+        fun showToastFail(msg: String) = msg.showLongToast(binding.root.context)
 
+//        if (auth.currentUser == null) {
+//            showToastFail("로그인 후 등록이 가능 합니다."); return
+//        }
+        if (binding.edtTitle.text.isNullOrEmpty()) {
+            showToastFail("제목을 입력해 주세요"); return
+        }
+        if (binding.edtPrice.text.isNullOrEmpty()) {
+            showToastFail("가격을 입력해 주세요"); return
+        }
+        if (binding.edtDescription.text.isNullOrEmpty()) {
+            showToastFail("상세 내용을 입력해 주세요"); return
         }
 
-//        val sellerId: String = "",
-//        val title: String = "",
-//        val createdAt: Long = 0L,
-//        val price: Int = 0,
-//        val imgUrl: String? = null,
-//        val talkCnt: Int? = null,
-//        val likeCnt: Int? = null,
-//        val id: String = "$sellerId-$createdAt"
-        val model = MarketModel(sellerId, title, System.currentTimeMillis(), price, description, imgUrlList)
+        val title = binding.edtTitle.text.toString()
+        val price = binding.edtPrice.text?.toString()?.toLongRemovedComma() ?: 0
+        val description = binding.edtDescription.text.toString()
+        val sellerId = auth.currentUser?.uid.orEmpty()
+        binding.layoutLoading.isVisible = true
 
-        marketListDB.push().setValue(model)
-
-        finish()
+        CoroutineScope(Dispatchers.IO).launch {
+            var imgUrlList: MutableList<String>? = null
+            uploadPhotoMultiple(sellerId, selectedImgUri) { remoteUrlList, uploadFailedList ->
+                binding.root.post { binding.layoutLoading.isVisible = false }
+                if (!remoteUrlList.isNullOrEmpty()) imgUrlList = remoteUrlList
+                if (!uploadFailedList.isNullOrEmpty()) {
+                    val sb = StringBuffer()
+                    uploadFailedList.forEach { sb.append(it.exception) }
+                    binding.root.post {
+                        showToastFail("${uploadFailedList.size}건의 실패가 있습니다.\n${sb}")
+                    }
+                }else{
+                    reqPushToDB(title, price, description, sellerId, imgUrlList)
+                }
+            }
+        }
     }
 
+    /**
+     * 사진을 업로드 하고 Remote Url 주소를 반환한다.
+     */
+    fun uploadPhoto(fileName: String, localUri: Uri, callback: (UploadPhotoResult) -> Unit) {
+        val storageRef = storage.reference.child("market/photo").child(fileName)
+        storageRef
+            .putFile(localUri)
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    storageRef.downloadUrl.addOnSuccessListener { remoteUri ->
+                        callback(UploadPhotoResult(true, remoteUri.toString()))
+                    }.addOnFailureListener { e ->
+                        callback(UploadPhotoResult(false, exception = e))
+                    }
+                } else {
+                    callback(UploadPhotoResult(false, exception = it.exception))
+                }
+            }
+    }
+
+    fun uploadPhotoMultiple(sellerId: String, imgList: MutableList<Uri>, callback: (MutableList<String>?, MutableList<UploadPhotoResult>) -> Unit) {
+        val imgUrlList = mutableListOf<String>()
+        val uploadFailedList = mutableListOf<UploadPhotoResult>()
+        val completedList = mutableListOf<UploadPhotoResult>()
+
+        if (imgList.isNotEmpty()) {
+            imgList.forEachIndexed { index, uri ->
+                val fileName = "${sellerId}_${System.currentTimeMillis()}_$index.png"
+                uploadPhoto(fileName, uri) { rst ->
+                    completedList.add(rst)
+                    if (rst.isSuccess && rst.remoteUrl != null) imgUrlList.add(rst.remoteUrl)
+                    else uploadFailedList.add(rst)
+
+                    if (completedList.size == imgList.size) {
+                        callback(imgUrlList, uploadFailedList)
+                    }
+                }
+            }
+        } else callback(imgUrlList, uploadFailedList)
+    }
+
+    fun reqPushToDB(title: String, price: Long, description: String, sellerId: String, imgUrlList: MutableList<String>?) {
+        marketListDB.push().setValue(MarketModel(sellerId, title, System.currentTimeMillis(), price, description, imgUrlList)).addOnSuccessListener {
+            "성공적으로 등록 되었습니다.".showShortToast(this)
+            finish()
+        }.addOnFailureListener {
+            "등록에 실패 했습니다.".showShortToast(this)
+        }
+    }
 
     // region ===========InitImagePicker===========
     fun initImagePickerByTedBottomPicker() {
         val permissionlistener: PermissionListener = object : PermissionListener {
-            override fun onPermissionGranted() {
-                Toast.makeText(this@AddMarketItemActivity, "Permission Granted", Toast.LENGTH_SHORT).show()
-            }
-
+            override fun onPermissionGranted() {}
             override fun onPermissionDenied(deniedPermissions: List<String>) {
-                Toast.makeText(this@AddMarketItemActivity, "Permission Denied\n$deniedPermissions", Toast.LENGTH_SHORT).show()
+                "$deniedPermissions 권한이 거부되어 사진을 올릴 수 없습니다.".showLongToast(binding.root.context)
             }
         }
 
@@ -106,7 +175,7 @@ class AddMarketItemActivity : AppCompatActivity() {
             .setPermissionListener(permissionlistener)
             .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
             .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            .check();
+            .check()
 
         val typedValue = TypedValue()
         val theme = context.theme
@@ -115,6 +184,10 @@ class AddMarketItemActivity : AppCompatActivity() {
 
         // TedBottomPicker 라이브러리 이지미 피커 사용
         binding.layoutBtnAddImg.setOnClickListener {
+            if(ContextCompat.checkSelfPermission(this@AddMarketItemActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
+                "${Manifest.permission.WRITE_EXTERNAL_STORAGE} 권한이 거부되어 사진을 올릴 수 없습니다.".showLongToast(this@AddMarketItemActivity)
+                return@setOnClickListener
+            }
             TedBottomPicker.with(this)
                 .setPeekHeight(1600)
                 .showTitle(false)
@@ -127,7 +200,10 @@ class AddMarketItemActivity : AppCompatActivity() {
                 .setTitleBackgroundResId(R.color.red)
                 .showMultiImage { list ->
                     // here is selected image uri list
-                    list.forEach { addLoadedImage(it) }
+                    list.forEach {
+                        addLoadedImage(it)
+                        selectedImgUri.add(it)
+                    }
                 }
         }
     }
@@ -162,4 +238,5 @@ class AddMarketItemActivity : AppCompatActivity() {
     // endregion
 
 
+    data class UploadPhotoResult(val isSuccess: Boolean, val remoteUrl: String? = null, val exception: Exception? = null)
 }
