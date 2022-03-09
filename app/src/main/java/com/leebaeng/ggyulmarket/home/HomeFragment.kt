@@ -67,6 +67,14 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         binding = FragmentHomeBinding.bind(view)
         binding.rcvMarketList.layoutManager = LinearLayoutManager(requireContext())
         binding.rcvMarketList.adapter = marketListAdapter
+        binding.btnAddNewItem.setOnClickListener {
+            if (auth.currentUser != null) {
+                startActivity(Intent(requireContext(), AddMarketItemActivity::class.java))
+            } else {
+                startActivity(Intent(requireContext(), AddMarketItemActivity::class.java))
+                Snackbar.make(view, "로그인이 필요 합니다.", Snackbar.LENGTH_SHORT).show()
+            }
+        }
 
     }
 
