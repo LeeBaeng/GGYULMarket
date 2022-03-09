@@ -52,10 +52,14 @@ dependencies {
     implementation 'com.google.firebase:firebase-database-ktx'
     implementation 'com.google.firebase:firebase-storage-ktx'
 
+    // Facebook Auth
     implementation 'com.facebook.android:facebook-login:8.2.0'
 
+    // Coroutine
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0'
+
     // LLog
-    implementation 'com.github.LeeBaeng:LLog:publish_0.01.001beta_20220221'
+    implementation 'com.github.LeeBaeng:LLog:1.0.02'
 
     // glide
     implementation 'com.github.bumptech.glide:glide:4.13.0'
