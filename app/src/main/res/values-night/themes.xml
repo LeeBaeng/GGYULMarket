@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.GgyulMarket" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.GGYULMarket" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/darkGray_222</item>
         <item name="colorPrimaryVariant">@color/darkGray_333</item>
