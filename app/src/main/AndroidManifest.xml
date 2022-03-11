@@ -35,6 +35,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.AddMarketItemActivity" />
+        <activity android:name=".ui.DetailActivity" />
 
     </application>
 

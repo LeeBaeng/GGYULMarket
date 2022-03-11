@@ -40,6 +40,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.bumptech.glide.request.target.Target
+import com.leebaeng.util.log.logS
 
 class AddMarketItemActivity : AppCompatActivity() {
 
@@ -61,6 +62,8 @@ class AddMarketItemActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        "onCreate AddMarketItemActivity!!".logS()
+
         binding = ActivityAddMarketItemBinding.inflate(layoutInflater)
         binding.onCompleteBtnClickListener = onCompleteBtnClickListener
         binding.onBackBtnClickListener = onBackBtnClickListener

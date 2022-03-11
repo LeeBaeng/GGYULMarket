@@ -43,7 +43,7 @@
                     android:id="@+id/layoutBtnAddImg"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:background="@drawable/shape_button_r10"
+                    android:background="@drawable/shape_button_r10_stroke_os"
                     android:gravity="center"
                     android:orientation="vertical"
                     android:padding="10dp">
@@ -130,7 +130,7 @@
                 android:id="@+id/edtDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/shape_button_r10"
+                android:background="@drawable/shape_button_r10_stroke_os"
                 android:gravity="top"
                 android:hint="올릴 게시글 내용을 작성해주세요. 가품 및 판매금지품목은 게시가 제한될 수 있어요."
                 android:padding="15dp" />
@@ -146,7 +146,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:padding="50dp"
-            android:background="@drawable/shape_r20"
+            android:background="@drawable/shape_r20_solid_wb_stroke_os"
             android:orientation="vertical"
             android:gravity="center"
             android:alpha="0.8"
