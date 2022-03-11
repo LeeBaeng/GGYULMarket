@@ -1,4 +1,4 @@
-package com.leebaeng.ggyulmarket
+package com.leebaeng.ggyulmarket.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -18,7 +18,6 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
@@ -29,17 +28,18 @@ import com.google.firebase.storage.ktx.storage
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
 import com.gun0912.tedpermission.provider.TedPermissionProvider.context
+import com.leebaeng.ggyulmarket.R
 import com.leebaeng.ggyulmarket.common.constants.DBKey
 import com.leebaeng.ggyulmarket.common.ext.*
 import com.leebaeng.ggyulmarket.databinding.ActivityAddMarketItemBinding
-import com.leebaeng.ggyulmarket.home.MarketModel
+import com.leebaeng.ggyulmarket.model.MarketModel
 import com.leebaeng.util.log.LLog
 import com.leebaeng.util.log.logW
 import gun0912.tedbottompicker.TedBottomPicker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
+import com.bumptech.glide.request.target.Target
 
 class AddMarketItemActivity : AppCompatActivity() {
 

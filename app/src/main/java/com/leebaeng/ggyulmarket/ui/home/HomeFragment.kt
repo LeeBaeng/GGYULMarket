@@ -1,4 +1,4 @@
-package com.leebaeng.ggyulmarket.home
+package com.leebaeng.ggyulmarket.ui.home
 
 import android.content.Intent
 import android.os.Bundle
@@ -14,10 +14,11 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.leebaeng.ggyulmarket.AddMarketItemActivity
+import com.leebaeng.ggyulmarket.ui.AddMarketItemActivity
 import com.leebaeng.ggyulmarket.R
 import com.leebaeng.ggyulmarket.common.constants.DBKey
 import com.leebaeng.ggyulmarket.databinding.FragmentHomeBinding
+import com.leebaeng.ggyulmarket.model.MarketModel
 import com.leebaeng.util.log.LLog
 
 class HomeFragment : Fragment(R.layout.fragment_home) {

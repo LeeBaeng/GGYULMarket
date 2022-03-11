@@ -1,4 +1,4 @@
-package com.leebaeng.ggyulmarket.home
+package com.leebaeng.ggyulmarket.ui.home
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -15,6 +15,7 @@ import com.leebaeng.ggyulmarket.common.ext.dpToPx
 import com.leebaeng.ggyulmarket.common.ext.getPriceCommaFormatWithWon
 import com.leebaeng.ggyulmarket.common.ext.getTimeGapFormatString
 import com.leebaeng.ggyulmarket.databinding.ItemMarketBinding
+import com.leebaeng.ggyulmarket.model.MarketModel
 import java.util.*
 
 class MarketListAdapter : ListAdapter<MarketModel, MarketListAdapter.ViewHolder>(diffUtil) {

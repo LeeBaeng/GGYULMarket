@@ -1,4 +1,4 @@
-package com.leebaeng.ggyulmarket.chatlist
+package com.leebaeng.ggyulmarket.ui.chatlist
 
 import android.os.Bundle
 import android.view.View

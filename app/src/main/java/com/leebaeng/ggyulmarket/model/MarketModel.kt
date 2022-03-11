@@ -1,4 +1,4 @@
-package com.leebaeng.ggyulmarket.home
+package com.leebaeng.ggyulmarket.model
 
 data class MarketModel(
     val sellerId: String = "",

@@ -1,4 +1,4 @@
-package com.leebaeng.ggyulmarket.login
+package com.leebaeng.ggyulmarket.ui.login
 
 import android.os.Bundle
 import android.view.View

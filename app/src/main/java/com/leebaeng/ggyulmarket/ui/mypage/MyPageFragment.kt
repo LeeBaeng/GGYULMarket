@@ -1,4 +1,4 @@
-package com.leebaeng.ggyulmarket.mypage
+package com.leebaeng.ggyulmarket.ui.mypage
 
 import android.os.Bundle
 import android.view.View
