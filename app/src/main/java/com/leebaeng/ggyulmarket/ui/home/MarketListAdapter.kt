@@ -18,7 +18,7 @@ import com.leebaeng.ggyulmarket.databinding.ItemMarketBinding
 import com.leebaeng.ggyulmarket.model.MarketModel
 import java.util.*
 
-class MarketListAdapter : ListAdapter<MarketModel, MarketListAdapter.ViewHolder>(diffUtil) {
+class MarketListAdapter(val onItemClickListener: (MarketModel) -> Unit) : ListAdapter<MarketModel, MarketListAdapter.ViewHolder>(diffUtil) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(ItemMarketBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
@@ -33,6 +33,7 @@ class MarketListAdapter : ListAdapter<MarketModel, MarketListAdapter.ViewHolder>
             binding.txtTitle.text = model.title
             binding.txtDate.text = Date(model.createdAt).getTimeGapFormatString()
             binding.txtPrice.text = model.price.getPriceCommaFormatWithWon()
+            binding.txtPriceProposeAble.isVisible = model.isPriceProposeAble ?: false
 
             fun setSubInfo(layout: ViewGroup, txtView: TextView, data: Int?) {
                 layout.isVisible = if (data != null && data > 0) {
@@ -51,6 +52,10 @@ class MarketListAdapter : ListAdapter<MarketModel, MarketListAdapter.ViewHolder>
                     .placeholder(R.drawable.ic_baseline_shopping_cart_24)
                     .into(binding.imgThumbnail)
             } else binding.imgThumbnail.setImageResource(R.drawable.ic_baseline_shopping_cart_24)
+
+            binding.root.setOnClickListener {
+                onItemClickListener(model)
+            }
         }
     }
 

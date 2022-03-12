@@ -23,6 +23,8 @@ import java.util.*
 
 class DetailActivity : BaseActivity() {
     lateinit var binding: ActivityDetailBinding
+    private lateinit var marketModel: MarketModel
+    private lateinit var userModel: UserModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +34,62 @@ class DetailActivity : BaseActivity() {
         setTransparentSystemUI()
 
         binding.statusBar.setPadding(0, resources.getDimensionPixelSize(resources.getIdentifier("status_bar_height", "dimen", "android")), 0, 0)
+
+        bindData(intent.getSerializableExtra("model") as MarketModel)
+    }
+
+    private fun bindData(model: MarketModel) {
+        marketModel = model
+        val newViewCnt = (model.viewCnt ?: 0) + 1
+
+        val auth = Firebase.auth
+        val collectionRef = Firebase.firestore.collection(DBKey.TABLE_MARKET_LIST)
+        collectionRef.document(model.id).update("viewCnt", newViewCnt)
+
+        binding.apply {
+            if (!model.imgUrl.isNullOrEmpty()) {
+                Glide.with(this@DetailActivity)
+                    .load(model.imgUrl[0])
+                    .into(imgDetailPhoto)
+            }
+
+            txtTitle.text = model.title
+            txtCreatedAt.text = Date(model.createdAt).getTimeGapFormatString()
+            txtDescription.text = model.description
+            txtPrice.text = model.price.getPriceCommaFormatWithWon()
+            txtReadCount.text = getString(R.string.atv_detail_view_cnt, newViewCnt.getPriceCommaFormat())
+            txtLikeCnt.text = (model.likeCnt ?: 0).getPriceCommaFormat()
+            txtPriceProposeAble.isVisible = model.isPriceProposeAble ?: false
+
+            auth.currentUser?.let {
+                if (it.uid == model.sellerId) return@let
+
+                val likedUserList = (model.likedUserList ?: mutableListOf()) as MutableList
+                if (likedUserList.contains(it.uid))
+                    imgFavorite.setImageResource(R.drawable.ic_baseline_favorite_24)
+
+                imgFavorite.setOnClickListener { _ ->
+                    var newLikeCnt = (model.likeCnt ?: 0)
+                    if (!likedUserList.contains(it.uid)) {
+                        newLikeCnt++
+                        likedUserList.add(auth.currentUser!!.uid)
+                        imgFavorite.setImageResource(R.drawable.ic_baseline_favorite_24)
+                    } else {
+                        if (newLikeCnt > 0) newLikeCnt--
+                        likedUserList.remove(auth.currentUser!!.uid)
+                        imgFavorite.setImageResource(R.drawable.ic_baseline_favorite_border_24)
+                    }
+                    txtLikeCnt.text = newLikeCnt.getPriceCommaFormat()
+                    collectionRef.document(model.id).update("likeCnt", newLikeCnt)
+                    collectionRef.document(model.id).update("likedUserList", likedUserList)
+                }
+            }
+            if (auth.currentUser == null) {
+                imgFavorite.setOnClickListener {
+                    "비회원은 좋아요를 할 수 없습니다.".showShortToast(this@DetailActivity)
+                }
+            }
+        }
     }
 
     private fun setTransparentSystemUI() {

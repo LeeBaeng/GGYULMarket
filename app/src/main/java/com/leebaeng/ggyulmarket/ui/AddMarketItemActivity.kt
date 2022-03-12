@@ -10,7 +10,6 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
@@ -19,10 +18,11 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ktx.database
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
@@ -34,15 +34,13 @@ import com.leebaeng.ggyulmarket.common.constants.DBKey
 import com.leebaeng.ggyulmarket.common.ext.*
 import com.leebaeng.ggyulmarket.databinding.ActivityAddMarketItemBinding
 import com.leebaeng.ggyulmarket.model.MarketModel
+import com.leebaeng.util.log.*
 import gun0912.tedbottompicker.TedBottomPicker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import com.bumptech.glide.request.target.Target
-import com.leebaeng.util.log.logS
 
 class AddMarketItemActivity : BaseActivity() {
-
     lateinit var binding: ActivityAddMarketItemBinding
     private var onCompleteBtnClickListener = View.OnClickListener { checkAddMarketItem() }
     private var onBackBtnClickListener = View.OnClickListener { finish() }
@@ -51,12 +49,12 @@ class AddMarketItemActivity : BaseActivity() {
         Firebase.auth
     }
 
-    private val storage: FirebaseStorage by lazy {
-        Firebase.storage
+    private val marketListRef: CollectionReference by lazy {
+        Firebase.firestore.collection(DBKey.TABLE_MARKET_LIST)
     }
 
-    private val marketListDB: DatabaseReference by lazy {
-        Firebase.database.reference.child(DBKey.TABLE_MARKET_LIST)
+    private val storage: FirebaseStorage by lazy {
+        Firebase.storage
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,6 +74,7 @@ class AddMarketItemActivity : BaseActivity() {
     fun checkAddMarketItem() {
         fun showToastFail(msg: String) = msg.showLongToast(binding.root.context)
 
+        (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(currentFocus?.windowToken, 0)
 //        if (auth.currentUser == null) {
 //            showToastFail("로그인 후 등록이 가능 합니다."); return
 //        }
@@ -92,7 +91,9 @@ class AddMarketItemActivity : BaseActivity() {
         val title = binding.edtTitle.text.toString()
         val price = binding.edtPrice.text?.toString()?.toLongRemovedComma() ?: 0
         val description = binding.edtDescription.text.toString()
+        val isPriceProposeAble = binding.chkProposePrice.isChecked
         val sellerId = auth.currentUser?.uid.orEmpty()
+
         binding.layoutLoading.isVisible = true
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -106,8 +107,8 @@ class AddMarketItemActivity : BaseActivity() {
                     binding.root.post {
                         showToastFail("${uploadFailedList.size}건의 실패가 있습니다.\n${sb}")
                     }
-                }else{
-                    reqPushToDB(title, price, description, sellerId, imgUrlList)
+                } else {
+                    reqPushToDB(title, price, description, sellerId, isPriceProposeAble, imgUrlList)
                 }
             }
         }
@@ -154,13 +155,27 @@ class AddMarketItemActivity : BaseActivity() {
         } else callback(imgUrlList, uploadFailedList)
     }
 
-    fun reqPushToDB(title: String, price: Long, description: String, sellerId: String, imgUrlList: MutableList<String>?) {
-        marketListDB.push().setValue(MarketModel(sellerId, title, System.currentTimeMillis(), price, description, imgUrlList)).addOnSuccessListener {
-            "성공적으로 등록 되었습니다.".showShortToast(this)
-            finish()
-        }.addOnFailureListener {
-            "등록에 실패 했습니다.".showShortToast(this)
-        }
+    fun reqPushToDB(title: String, price: Long, description: String, sellerId: String, isPriceProposeAble: Boolean, imgUrlList: MutableList<String>?) {
+        val model = MarketModel(sellerId, title, System.currentTimeMillis(), price, description, isPriceProposeAble, imgUrlList)
+        marketListRef.document(model.id)
+            .set(model)
+            .addOnSuccessListener {
+                "DocumentSnapshot added with ID: ${model.id}".logD()
+                "성공적으로 등록 되었습니다.".showShortToast(this)
+                setResult(1000)
+                finish()
+            }
+            .addOnFailureListener { e ->
+                "등록에 실패 했습니다.".showShortToast(this)
+                e.logEX("Error adding document")
+            }
+
+//        marketListDB.push().setValue(MarketModel(sellerId, title, System.currentTimeMillis(), price, description, imgUrlList)).addOnSuccessListener {
+//            "성공적으로 등록 되었습니다.".showShortToast(this)
+//            finish()
+//        }.addOnFailureListener {
+//            "등록에 실패 했습니다.".showShortToast(this)
+//        }
     }
 
     // region ===========InitImagePicker===========

@@ -3,4 +3,5 @@
     <string name="facebook_app_id">1923031621230602</string>
     <string name="fb_login_protocol_scheme">fb1923031621230602</string>
     <string name="atv_detail_propose_price"><u>가격제안하기</u></string>
+    <string name="atv_detail_view_cnt">조회 %1$s</string>
 </resources>
