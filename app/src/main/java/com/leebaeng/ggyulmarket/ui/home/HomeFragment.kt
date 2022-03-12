@@ -3,7 +3,6 @@ package com.leebaeng.ggyulmarket.ui.home
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
@@ -14,14 +13,20 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.leebaeng.ggyulmarket.ui.AddMarketItemActivity
 import com.leebaeng.ggyulmarket.R
 import com.leebaeng.ggyulmarket.common.constants.DBKey
 import com.leebaeng.ggyulmarket.databinding.FragmentHomeBinding
 import com.leebaeng.ggyulmarket.model.MarketModel
-import com.leebaeng.util.log.LLog
+import com.leebaeng.ggyulmarket.ui.AddMarketItemActivity
+import com.leebaeng.ggyulmarket.ui.BaseFragment
+import com.leebaeng.ggyulmarket.ui.DetailActivity
+import com.leebaeng.util.log.logD
+import com.leebaeng.util.log.logEX
+import com.leebaeng.util.log.logS
+import kotlin.math.floor
+import kotlin.random.Random
 
-class HomeFragment : Fragment(R.layout.fragment_home) {
+class HomeFragment : BaseFragment(R.layout.fragment_home) {
     private lateinit var binding: FragmentHomeBinding
     private lateinit var marketListAdapter: MarketListAdapter
     private lateinit var marketListDB: DatabaseReference

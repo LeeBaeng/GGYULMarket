@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -33,8 +34,6 @@ import com.leebaeng.ggyulmarket.common.constants.DBKey
 import com.leebaeng.ggyulmarket.common.ext.*
 import com.leebaeng.ggyulmarket.databinding.ActivityAddMarketItemBinding
 import com.leebaeng.ggyulmarket.model.MarketModel
-import com.leebaeng.util.log.LLog
-import com.leebaeng.util.log.logW
 import gun0912.tedbottompicker.TedBottomPicker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -42,7 +41,7 @@ import kotlinx.coroutines.launch
 import com.bumptech.glide.request.target.Target
 import com.leebaeng.util.log.logS
 
-class AddMarketItemActivity : AppCompatActivity() {
+class AddMarketItemActivity : BaseActivity() {
 
     lateinit var binding: ActivityAddMarketItemBinding
     private var onCompleteBtnClickListener = View.OnClickListener { checkAddMarketItem() }
@@ -62,7 +61,6 @@ class AddMarketItemActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        "onCreate AddMarketItemActivity!!".logS()
 
         binding = ActivityAddMarketItemBinding.inflate(layoutInflater)
         binding.onCompleteBtnClickListener = onCompleteBtnClickListener
@@ -187,7 +185,7 @@ class AddMarketItemActivity : AppCompatActivity() {
 
         // TedBottomPicker 라이브러리 이지미 피커 사용
         binding.layoutBtnAddImg.setOnClickListener {
-            if(ContextCompat.checkSelfPermission(this@AddMarketItemActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
+            if (ContextCompat.checkSelfPermission(this@AddMarketItemActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
                 "${Manifest.permission.WRITE_EXTERNAL_STORAGE} 권한이 거부되어 사진을 올릴 수 없습니다.".showLongToast(this@AddMarketItemActivity)
                 return@setOnClickListener
             }

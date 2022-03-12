@@ -3,7 +3,6 @@ package com.leebaeng.ggyulmarket.ui
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.ktx.database
@@ -16,12 +15,10 @@ import com.leebaeng.ggyulmarket.ui.mypage.MyPageFragment
 import com.leebaeng.util.log.LLog
 import com.leebaeng.util.log.logS
 
-class MainActivity : AppCompatActivity() {
-
+class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         LLog.init(this)
-        "MainActivity onCreated!!".logS()
 
         setContentView(R.layout.activity_main)
 
