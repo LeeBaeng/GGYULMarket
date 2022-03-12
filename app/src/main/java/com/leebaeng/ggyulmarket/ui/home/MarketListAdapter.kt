@@ -16,6 +16,7 @@ import com.leebaeng.ggyulmarket.common.ext.getPriceCommaFormatWithWon
 import com.leebaeng.ggyulmarket.common.ext.getTimeGapFormatString
 import com.leebaeng.ggyulmarket.databinding.ItemMarketBinding
 import com.leebaeng.ggyulmarket.model.MarketModel
+import com.leebaeng.util.log.logD
 import java.util.*
 
 class MarketListAdapter(val onItemClickListener: (MarketModel) -> Unit) : ListAdapter<MarketModel, MarketListAdapter.ViewHolder>(diffUtil) {
@@ -29,11 +30,12 @@ class MarketListAdapter(val onItemClickListener: (MarketModel) -> Unit) : ListAd
 
     inner class ViewHolder(private val binding: ItemMarketBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bindData(model: MarketModel) {
+            model.logD("ViewHolder.bindData")
 
             binding.txtTitle.text = model.title
             binding.txtDate.text = Date(model.createdAt).getTimeGapFormatString()
             binding.txtPrice.text = model.price.getPriceCommaFormatWithWon()
-            binding.txtPriceProposeAble.isVisible = model.isPriceProposeAble ?: false
+            binding.txtPriceProposeAble.isVisible = model.priceProposeAble ?: false
 
             fun setSubInfo(layout: ViewGroup, txtView: TextView, data: Int?) {
                 layout.isVisible = if (data != null && data > 0) {

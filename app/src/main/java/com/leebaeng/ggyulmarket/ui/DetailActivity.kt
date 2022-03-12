@@ -59,7 +59,7 @@ class DetailActivity : BaseActivity() {
             txtPrice.text = model.price.getPriceCommaFormatWithWon()
             txtReadCount.text = getString(R.string.atv_detail_view_cnt, newViewCnt.getPriceCommaFormat())
             txtLikeCnt.text = (model.likeCnt ?: 0).getPriceCommaFormat()
-            txtPriceProposeAble.isVisible = model.isPriceProposeAble ?: false
+            txtPriceProposeAble.isVisible = model.priceProposeAble ?: false
 
             auth.currentUser?.let {
                 if (it.uid == model.sellerId) return@let
