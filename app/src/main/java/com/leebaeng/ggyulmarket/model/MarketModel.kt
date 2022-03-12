@@ -8,7 +8,7 @@ data class MarketModel(
     val createdAt: Long = 0L,
     val price: Long = 0L,
     val description: String = "",
-    val isPriceProposeAble: Boolean? = false,
+    val priceProposeAble: Boolean? = false,
     val imgUrl: List<String>? = null,
     val talkCnt: Int? = null,
     val likeCnt: Int? = null,
