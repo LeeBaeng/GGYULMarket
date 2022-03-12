@@ -45,20 +45,40 @@
             app:layout_constraintTop_toBottomOf="@id/txtTitle"
             tool:text="5분전" />
 
-        <TextView
-            android:id="@+id/txtPrice"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:ellipsize="end"
-            android:lines="1"
-            android:textColor="?attr/colorOnPrimary"
-            android:textSize="17sp"
-            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="@id/txtTitle"
             app:layout_constraintStart_toStartOf="@id/txtTitle"
             app:layout_constraintTop_toBottomOf="@id/txtDate"
-            tool:text="99999999999999999999999 원" />
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp"
+            >
+            <TextView
+                android:id="@+id/txtPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:lines="1"
+                android:textColor="?attr/colorOnPrimary"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                tool:text="9999999999999 원" />
+
+            <TextView
+                android:id="@+id/txtPriceProposeAble"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:layout_marginStart="5dp"
+                android:textSize="12sp"
+                android:text="협의 가능"
+                android:visibility="invisible"
+                />
+
+
+        </LinearLayout>
+
 
         <LinearLayout
             android:layout_width="wrap_content"

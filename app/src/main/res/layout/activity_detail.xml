@@ -71,6 +71,28 @@
                                 android:layout_height="wrap_content"
                                 tools:text="지역명" />
                         </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            >
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="매너온도"
+                                />
+
+                            <TextView
+                                android:id="@+id/txtMannerPoint"
+                                android:gravity="center"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                tools:text="37.8"
+                                />
+                        </LinearLayout>
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <View
@@ -95,6 +117,7 @@
                         tools:text="5분 전" />
 
                     <TextView
+                        android:id="@+id/txtDescription"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="20dp"
@@ -137,8 +160,19 @@
                             android:src="@drawable/ic_baseline_favorite_border_24"
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            android:padding="10dp"
+                            android:paddingTop="10dp"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
                             />
+
+                        <TextView
+                            android:id="@+id/txtLikeCnt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            app:layout_constraintTop_toBottomOf="@id/imgFavorite"
+                            app:layout_constraintStart_toStartOf="@id/imgFavorite"
+                            app:layout_constraintEnd_toEndOf="@id/imgFavorite"
+                            tools:text="10"/>
 
                         <View
                             android:layout_width="1dp"
@@ -162,6 +196,7 @@
                             android:orientation="vertical"
                             >
                             <TextView
+                                android:id="@+id/txtPrice"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 tools:text = "70,000 원"
@@ -169,11 +204,13 @@
                                 />
 
                             <TextView
+                                android:id="@+id/txtPriceProposeAble"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                tools:text = "@string/atv_detail_propose_price"
                                 android:textSize="13sp"
                                 android:textColor="?attr/colorPrimaryVariant"
+                                android:text="협의 가능"
+                                android:visibility="invisible"
                                 />
 
                         </LinearLayout>
