@@ -1,8 +1,9 @@
 package com.leebaeng.ggyulmarket.model
 
-data class UserModel (
+data class UserModel(
     val id: String,
     val nickName: String,
     val locationName: String,
-    val manner : Float
+    val profileImgUrl: String,
+    val manner: Float
 )

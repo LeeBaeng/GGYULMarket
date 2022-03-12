@@ -14,9 +14,11 @@
             android:background="?android:attr/windowBackground"
             android:id="@+id/scvPage"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             tools:layout_editor_absoluteX="185dp"
-            tools:layout_editor_absoluteY="-152dp">
+            tools:layout_editor_absoluteY="-152dp"
+            app:layout_constraintBottom_toTopOf="@+id/layoutBottomBar"
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -78,6 +80,8 @@
                             android:orientation="vertical"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            android:gravity="center_vertical"
                             >
                             <TextView
                                 android:layout_width="wrap_content"
@@ -143,98 +147,105 @@
                         android:textSize="15sp"
                         android:textStyle="bold" />
 
-                    <View
-                        style="@style/spline"
-                        android:layout_marginTop="20dp"
-                        android:layout_marginBottom="5dp" />
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        >
-
-                        <ImageView
-                            android:id="@+id/imgFavorite"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@drawable/ic_baseline_favorite_border_24"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            android:paddingTop="10dp"
-                            android:paddingLeft="10dp"
-                            android:paddingRight="10dp"
-                            />
-
-                        <TextView
-                            android:id="@+id/txtLikeCnt"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            app:layout_constraintTop_toBottomOf="@id/imgFavorite"
-                            app:layout_constraintStart_toStartOf="@id/imgFavorite"
-                            app:layout_constraintEnd_toEndOf="@id/imgFavorite"
-                            tools:text="10"/>
-
-                        <View
-                            android:layout_width="1dp"
-                            android:layout_height="0dp"
-                            android:layout_marginStart="10dp"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/imgFavorite"
-                            style="@style/spline"
-                            />
-
-                        <LinearLayout
-                            android:id="@+id/layoutPrice"
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:layout_marginStart="20dp"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/imgFavorite"
-                            app:layout_constraintEnd_toStartOf="@+id/btnGoChat"
-                            android:orientation="vertical"
-                            >
-                            <TextView
-                                android:id="@+id/txtPrice"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                tools:text = "70,000 원"
-                                android:textSize="17sp"
-                                />
-
-                            <TextView
-                                android:id="@+id/txtPriceProposeAble"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textSize="13sp"
-                                android:textColor="?attr/colorPrimaryVariant"
-                                android:text="협의 가능"
-                                android:visibility="invisible"
-                                />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:background="@drawable/shape_r10_solid_pv"
-                            android:id="@+id/btnGoChat"
-                            android:gravity="center"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:padding="10dp"
-                            android:text="채팅으로 거래하기"
-                            android:textColor="@color/white"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            />
-
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layoutBottomBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:background="?android:attr/windowBackground"
+            >
+
+            <View
+                style="@style/spline"
+                android:layout_marginBottom="5dp"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <ImageView
+                android:id="@+id/imgFavorite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_favorite_border_24"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:paddingTop="10dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                />
+
+            <TextView
+                android:id="@+id/txtLikeCnt"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:layout_constraintTop_toBottomOf="@id/imgFavorite"
+                app:layout_constraintStart_toStartOf="@id/imgFavorite"
+                app:layout_constraintEnd_toEndOf="@id/imgFavorite"
+                tools:text="10"/>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imgFavorite"
+                style="@style/spline"
+                />
+
+            <LinearLayout
+                android:id="@+id/layoutPrice"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="20dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imgFavorite"
+                app:layout_constraintEnd_toStartOf="@+id/btnGoChat"
+                android:orientation="vertical"
+                android:gravity="center_vertical"
+                >
+                <TextView
+                    android:id="@+id/txtPrice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text = "70,000 원"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    />
+
+                <TextView
+                    android:id="@+id/txtPriceProposeAble"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="13sp"
+                    android:textColor="?attr/colorPrimaryVariant"
+                    android:text="협의 가능"
+                    android:visibility="invisible"
+                    />
+
+            </LinearLayout>
+
+            <TextView
+                android:background="@drawable/shape_r10_solid_pv"
+                android:id="@+id/btnGoChat"
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="채팅으로 거래하기"
+                android:textColor="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/statusBar"
