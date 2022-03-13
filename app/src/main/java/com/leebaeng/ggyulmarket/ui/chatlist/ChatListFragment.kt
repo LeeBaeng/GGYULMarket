@@ -5,7 +5,9 @@ import android.view.View
 import com.leebaeng.ggyulmarket.R
 import com.leebaeng.ggyulmarket.databinding.FragmentChatlistBinding
 import com.leebaeng.ggyulmarket.ui.BaseFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ChatListFragment : BaseFragment(R.layout.fragment_chatlist) {
     private lateinit var binding: FragmentChatlistBinding
 

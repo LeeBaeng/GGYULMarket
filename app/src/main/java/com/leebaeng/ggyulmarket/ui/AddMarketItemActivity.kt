@@ -19,43 +19,41 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.ktx.storage
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
 import com.gun0912.tedpermission.provider.TedPermissionProvider.context
 import com.leebaeng.ggyulmarket.R
-import com.leebaeng.ggyulmarket.common.constants.DBKey
 import com.leebaeng.ggyulmarket.common.ext.*
 import com.leebaeng.ggyulmarket.databinding.ActivityAddMarketItemBinding
+import com.leebaeng.ggyulmarket.di.DBAdapter
 import com.leebaeng.ggyulmarket.model.MarketModel
 import com.leebaeng.util.log.*
+import dagger.hilt.android.AndroidEntryPoint
 import gun0912.tedbottompicker.TedBottomPicker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class AddMarketItemActivity : BaseActivity() {
+    @Inject lateinit var dbAdapter: DBAdapter
     lateinit var binding: ActivityAddMarketItemBinding
     private var onCompleteBtnClickListener = View.OnClickListener { checkAddMarketItem() }
     private var onBackBtnClickListener = View.OnClickListener { finish() }
     private var selectedImgUri = mutableListOf<Uri>()
-    private val auth: FirebaseAuth by lazy {
-        Firebase.auth
-    }
 
-    private val marketListRef: CollectionReference by lazy {
-        Firebase.firestore.collection(DBKey.TABLE_MARKET_LIST)
-    }
+//    private val auth: FirebaseAuth by lazy {
+//        Firebase.auth
+//    }
 
-    private val storage: FirebaseStorage by lazy {
-        Firebase.storage
-    }
+//    private val marketListRef: CollectionReference by lazy {
+//        Firebase.firestore.collection(Const.FS_TABLE_MARKET)
+//    }
+//
+//    private val storage: FirebaseStorage by lazy {
+//        Firebase.storage
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,7 +90,7 @@ class AddMarketItemActivity : BaseActivity() {
         val price = binding.edtPrice.text?.toString()?.toLongRemovedComma() ?: 0
         val description = binding.edtDescription.text.toString()
         val isPriceProposeAble = binding.chkProposePrice.isChecked
-        val sellerId = auth.currentUser?.uid.orEmpty()
+        val sellerId = dbAdapter.auth.currentUser?.uid.orEmpty()
 
         binding.layoutLoading.isVisible = true
 
@@ -118,7 +116,7 @@ class AddMarketItemActivity : BaseActivity() {
      * 사진을 업로드 하고 Remote Url 주소를 반환한다.
      */
     fun uploadPhoto(fileName: String, localUri: Uri, callback: (UploadPhotoResult) -> Unit) {
-        val storageRef = storage.reference.child("market/photo").child(fileName)
+        val storageRef = dbAdapter.marketPhotoRef.child(fileName)
         storageRef
             .putFile(localUri)
             .addOnCompleteListener {
@@ -157,6 +155,7 @@ class AddMarketItemActivity : BaseActivity() {
 
     fun reqPushToDB(title: String, price: Long, description: String, sellerId: String, isPriceProposeAble: Boolean, imgUrlList: MutableList<String>?) {
         val model = MarketModel(sellerId, title, System.currentTimeMillis(), price, description, isPriceProposeAble, imgUrlList)
+        val marketListRef = dbAdapter.marketDB
         marketListRef.document(model.id)
             .set(model)
             .addOnSuccessListener {
