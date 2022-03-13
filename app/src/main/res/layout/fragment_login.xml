@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
 
+    <data>
+        <variable
+            name="fragment"
+            type="com.leebaeng.ggyulmarket.ui.mypage.LoginFragment" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
@@ -18,7 +24,7 @@
             android:orientation="vertical"
             android:paddingStart="50dp"
             android:paddingEnd="50dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="50dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -43,32 +49,50 @@
                 android:hint="비밀번호"
                 android:inputType="textPassword" />
 
-            <Button
+            <TextView
                 android:id="@+id/btnLogin"
-                android:layout_width="300dp"
-                android:layout_height="50dp"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
                 android:layout_marginBottom="10dp"
-                android:text="로그인" />
+                android:background="@drawable/shape_button_r10_stroke_os"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textSize="18dp"
+                android:text="로그인"
+                android:onClick="@{fragment::onLoginBtnClicked}"
+                />
 
-            <Button
+            <TextView
                 android:id="@+id/btnJoin"
-                android:layout_width="300dp"
-                android:layout_height="50dp"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
                 android:layout_marginBottom="10dp"
-                android:text="회원가입" />
+                android:background="@drawable/shape_button_r10_stroke_os"
+                android:gravity="center"
+                android:textSize="16dp"
+                android:text="회원가입"
+                android:onClick="@{fragment::onJoinBtnClicked}"
+                />
 
-            <Button
+            <TextView
                 android:id="@+id/btnFindIdAndPwd"
-                android:layout_width="300dp"
-                android:layout_height="50dp"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
                 android:layout_marginBottom="10dp"
-                android:text="ID/비번 찾기" />
+                android:background="@drawable/shape_button_r10_stroke_os"
+                android:gravity="center"
+                android:textSize="16dp"
+                android:text="ID/비번 찾기"
+                android:onClick="@{fragment::onFindPwdBtnClicked}"
+                />
 
             <com.facebook.login.widget.LoginButton
                 android:id="@+id/btnFacebookLogin"
                 android:layout_width="300dp"
                 android:layout_height="50dp"
-                android:layout_marginTop="5dp" />
+                android:layout_marginTop="5dp"
+                android:onClick="@{fragment::onFaceBookLoginClicked}"
+                />
         </LinearLayout>
 
 

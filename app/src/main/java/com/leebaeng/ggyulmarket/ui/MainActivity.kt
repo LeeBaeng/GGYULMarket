@@ -12,8 +12,8 @@ import com.leebaeng.ggyulmarket.common.Constants
 import com.leebaeng.ggyulmarket.di.DBAdapter
 import com.leebaeng.ggyulmarket.ui.chatlist.ChatListFragment
 import com.leebaeng.ggyulmarket.ui.home.HomeFragment
-import com.leebaeng.ggyulmarket.ui.login.JoinFragment
-import com.leebaeng.ggyulmarket.ui.login.LoginFragment
+import com.leebaeng.ggyulmarket.ui.mypage.JoinFragment
+import com.leebaeng.ggyulmarket.ui.mypage.LoginFragment
 import com.leebaeng.ggyulmarket.ui.mypage.MyPageFragment
 import com.leebaeng.util.log.LLog
 import com.leebaeng.util.log.logE
