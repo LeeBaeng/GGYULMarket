@@ -24,6 +24,8 @@ import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
+// TODO : 조회수 안올라가는 이슈, 좋아요 및 채팅시작 안되는 이슈 확인 필요
+
 @AndroidEntryPoint
 class DetailActivity : BaseActivity() {
     @Inject
