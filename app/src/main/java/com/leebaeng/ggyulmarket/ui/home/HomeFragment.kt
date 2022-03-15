@@ -8,7 +8,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.leebaeng.ggyulmarket.R
@@ -20,20 +19,23 @@ import com.leebaeng.ggyulmarket.ui.AddMarketItemActivity
 import com.leebaeng.ggyulmarket.ui.BaseFragment
 import com.leebaeng.ggyulmarket.ui.DetailActivity
 import com.leebaeng.util.log.logD
-import com.leebaeng.util.log.logEX
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.floor
 import kotlin.random.Random
 
 @AndroidEntryPoint
 class HomeFragment : BaseFragment(R.layout.fragment_home) {
-    @Inject lateinit var dbAdapter: DBAdapter
+    @Inject
+    lateinit var dbAdapter: DBAdapter
     private lateinit var binding: FragmentHomeBinding
     private lateinit var marketListAdapter: MarketListAdapter
     private lateinit var auth: FirebaseAuth
 
-    private val marketList = mutableListOf<MarketModel>()
+    private var marketList = mutableListOf<MarketModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -42,7 +44,7 @@ class HomeFragment : BaseFragment(R.layout.fragment_home) {
 
         marketListAdapter = MarketListAdapter(onItemClickListener = { model: MarketModel ->
             val i = Intent(requireContext(), DetailActivity::class.java)
-            i.putExtra("model", model)
+            i.putExtra("modelId", model.id)
             startActivity(i)
         })
         binding = FragmentHomeBinding.bind(view)
@@ -82,24 +84,18 @@ class HomeFragment : BaseFragment(R.layout.fragment_home) {
     override fun onResume() {
         super.onResume()
         "onResume".logD(this)
+
+//        createTestData()
     }
 
+    // TODO : getMarketList() : limit 및 Paging 적용
     fun getMarketList(startAt: DocumentSnapshot? = null, limit: Long = 5) {
-        dbAdapter.marketDB
-            .orderBy("createdAt", Query.Direction.DESCENDING)
-            .limit(15)
-            .get()
-            .addOnSuccessListener { result ->
-//                for (document in result)
-//                    "db collection(${Const.FS_TABLE_MARKET}) get :  ${document.id} => ${document.data}".logD()
-
-                val models = result.toObjects(MarketModel::class.java)
-                for (m in models) marketList.add(m)
+        CoroutineScope(Dispatchers.IO).launch {
+            marketList = dbAdapter.getMarketModels() as MutableList<MarketModel>
+            CoroutineScope(Dispatchers.Main).launch {
                 submitList()
             }
-            .addOnFailureListener { exception ->
-                exception.logEX("Error getting documents.")
-            }
+        }
     }
 
     private fun submitList() {
@@ -156,15 +152,15 @@ class HomeFragment : BaseFragment(R.layout.fragment_home) {
             "앞범퍼", "순살 치킨", "최고급 한우 꽃등심", "살치살", "국거리", "음료수", "보드카", "와인", "위스키"
         )
 
-        for (i in 0 until 100) {
-            val id = "${sellerIdPrefix.getRandomValue()}${sellerIdSuffix.getRandomValue()}"
+        for (i in 0 until 30) {
             val price = random(1, 1000) * 1000
             val time = System.currentTimeMillis() - 2629800000L.random()
+            val sellerId = "${sellerIdPrefix.getRandomValue()}${sellerIdSuffix.getRandomValue()}"
             val title =
-                (if(10.random() < 7) "${titlePrefix.getRandomValue()} " else "") +
-                        (if(Random.nextBoolean()) ("${stateList.getRandomValue()} ") else "") +
+                (if (10.random() < 7) "${titlePrefix.getRandomValue()} " else "") +
+                        (if (Random.nextBoolean()) ("${stateList.getRandomValue()} ") else "") +
                         "${titleProduct.getRandomValue()}" +
-                        if(Random.nextBoolean()) " 팝니다." else ""
+                        if (Random.nextBoolean()) " 팝니다." else ""
             var imgList: MutableList<String>? = mutableListOf()
 
             if (20.random() < 20) {
@@ -174,29 +170,28 @@ class HomeFragment : BaseFragment(R.layout.fragment_home) {
             }
             if (imgList?.size == 0) imgList = null
 
-
             val model = MarketModel(
-                id, title, time, price, "$id 님이 물건을 판매하려고 합니다. 상태는 ${stateList.getRandomValue()} 입니다.",
+                sellerId, title, time, price, "$title\n$sellerId 님이 물건을 판매하려고 합니다. 상태는 ${stateList.getRandomValue()} 입니다.",
                 Random.nextBoolean(), imgList
             )
-            Firebase.firestore.collection(Constants.FS_TABLE_MARKET).add(model)
+            Firebase.firestore.collection(Constants.FS_TABLE_MARKET).document(model.id).set(model)
         }
 
-        val id = "${sellerIdPrefix.getRandomValue()}${sellerIdSuffix.getRandomValue()}"
-        val price = random(1, 1000) * 1000
-        val time = System.currentTimeMillis()
-        val title = "한번도 안쓴 사람은 있어도 한번만 쓴사람은 없다는 전세계 하나뿐인 Galaxy Note25 선착순 반품불가"
-        var imgList: MutableList<String>? = mutableListOf()
-        if (10.random() < 9) {
-            for (a in 0 until imgUrlList.size.random()) {
-                imgList!!.add(imgUrlList.getRandomValue() as String)
-            }
-        }
-        val model = MarketModel(
-            id, title, time, price, "$id 님이 물건을 판매하려고 합니다. 상태는 ${stateList.getRandomValue()} 입니다.",
-            Random.nextBoolean(), imgList
-        )
-        Firebase.firestore.collection(Constants.FS_TABLE_MARKET).add(model)
+//        val id = "${sellerIdPrefix.getRandomValue()}${sellerIdSuffix.getRandomValue()}"
+//        val price = random(1, 1000) * 1000
+//        val time = System.currentTimeMillis()
+//        val title = "한번도 안쓴 사람은 있어도 한번만 쓴사람은 없다는 전세계 하나뿐인 Galaxy Note25 선착순 반품불가"
+//        val imgList: MutableList<String>? = mutableListOf()
+//        if (10.random() < 9) {
+//            for (a in 0 until imgUrlList.size.random()) {
+//                imgList!!.add(imgUrlList.getRandomValue() as String)
+//            }
+//        }
+//        val model = MarketModel(
+//            id, title, time, price, "$id 님이 물건을 판매하려고 합니다. 상태는 ${stateList.getRandomValue()} 입니다.",
+//            Random.nextBoolean(), imgList
+//        )
+//        Firebase.firestore.collection(Constants.FS_TABLE_MARKET).add(model)
     }
 
 }

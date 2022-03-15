@@ -6,6 +6,7 @@ import android.view.WindowManager
 import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
+import com.google.firebase.firestore.DocumentReference
 import com.leebaeng.ggyulmarket.R
 import com.leebaeng.ggyulmarket.common.ext.getPriceCommaFormat
 import com.leebaeng.ggyulmarket.common.ext.getPriceCommaFormatWithWon
@@ -18,13 +19,12 @@ import com.leebaeng.ggyulmarket.model.MarketModel
 import com.leebaeng.ggyulmarket.model.UserModel
 import com.leebaeng.util.log.logD
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.util.*
 import javax.inject.Inject
 
-// TODO : 조회수 안올라가는 이슈, 좋아요 및 채팅시작 안되는 이슈 확인 필요
+// TODO : 좋아요 및 채팅시작 안되는 이슈 확인 필요
+// TODO : DB작업 공통작업은 DBAdapter로 옮기기
 
 @AndroidEntryPoint
 class DetailActivity : BaseActivity() {
@@ -32,6 +32,9 @@ class DetailActivity : BaseActivity() {
     lateinit var dbAdapter: DBAdapter
 
     lateinit var binding: ActivityDetailBinding
+
+    private lateinit var docRefMarket: DocumentReference
+
     private lateinit var sellerModel: UserModel
     private lateinit var marketModel: MarketModel
     private var buyerModel: UserModel? = null
@@ -46,39 +49,48 @@ class DetailActivity : BaseActivity() {
 
         binding.statusBar.setPadding(0, resources.getDimensionPixelSize(resources.getIdentifier("status_bar_height", "dimen", "android")), 0, 0)
 
-        marketModel = intent.getSerializableExtra("model") as MarketModel
-        bindData()
-    }
+        val marketId = intent.getStringExtra("modelId")
+        if (marketId == null) {
+            "잘못된 상품 정보 입니다.".showShortToast(this)
+            finish()
+            return
+        }
 
-    private fun bindData() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val auth = dbAdapter.auth
-            val docRefMarket = dbAdapter.marketDB.document(marketModel.id)
-            val docRefMy = dbAdapter.userDB.document()
-            val docRefSeller = dbAdapter.userDB.document()
-
-
-            sellerModel =
-                if (!this@DetailActivity.marketModel.sellerId.isNullOrEmpty()) dbAdapter.getUserModel(this@DetailActivity.marketModel.sellerId) ?: UserModel("", "", "", 36.5f) else UserModel(
-                    "",
-                    "",
-                    "",
-                    36.5f
-                )
-            buyerModel = dbAdapter.getMyUserModel()
-
-            val newViewCnt = (marketModel.viewCnt ?: 0) + 1
-            docRefMarket.update("viewCnt", newViewCnt)
-
-            CoroutineScope(Dispatchers.Main).launch {
-                initSellerInfo()
-                initProductInfo(newViewCnt)
-                initLikedInfo()
-            }
+        val initDBJob = CoroutineScope(Dispatchers.IO).launch { initDB(marketId) }
+        CoroutineScope(Dispatchers.Main).launch {
+            initDBJob.join()
+            updateUI()
         }
     }
 
-    private fun initProductInfo(viewCnt: Int) {
+    private suspend fun initDB(marketId: String) {
+        docRefMarket = dbAdapter.marketDB.document(marketId)
+        marketModel = dbAdapter.getMarketModel(marketId) ?: return
+
+        // TODO : 임시 사용자용 SellerModel 테스트 코드 삭제
+        sellerModel =
+            if (this@DetailActivity.marketModel.sellerId.isNotEmpty())
+                dbAdapter.getUserModel(this@DetailActivity.marketModel.sellerId)
+                    ?: UserModel("", "", "", 36.5f)
+            else return
+        buyerModel = dbAdapter.getMyUserModel()
+
+        "marketModel = $marketModel".logD()
+        "buyerModel = $buyerModel / sellerModel = $sellerModel".logD()
+    }
+
+    private fun updateViewCnt() {
+        val newViewCnt = (marketModel.viewCnt ?: 0) + 1
+        docRefMarket.update("viewCnt", newViewCnt)
+    }
+
+    private fun updateUI() {
+        updateSellerInfo()
+        updateProductInfo()
+        updateLikedInfo()
+    }
+
+    private fun updateProductInfo() {
         if (!marketModel.imgUrl.isNullOrEmpty()) {
             Glide.with(this@DetailActivity)
                 .load(marketModel.imgUrl!![0])
@@ -89,20 +101,23 @@ class DetailActivity : BaseActivity() {
         binding.txtCreatedAt.text = Date(marketModel.createdAt).getTimeGapFormatString()
         binding.txtDescription.text = marketModel.description
         binding.txtPrice.text = marketModel.price.getPriceCommaFormatWithWon()
-        binding.txtReadCount.text = getString(R.string.atv_detail_view_cnt, viewCnt.getPriceCommaFormat())
-        binding.txtLikeCnt.text = (marketModel.likeCnt ?: 0).getPriceCommaFormat()
+        binding.txtReadCount.text = getString(R.string.atv_detail_view_cnt, marketModel.viewCnt?.getPriceCommaFormat() ?: 0)
+        binding.txtLikeCnt.text = (marketModel.likedUserList?.size ?: 0).getPriceCommaFormat()
         binding.txtPriceProposeAble.isVisible = marketModel.priceProposeAble ?: false
     }
 
-    private fun initSellerInfo() {
+    private fun updateSellerInfo() {
         binding.txtUserNickName.text = sellerModel.nickName
         binding.txtUserLocation.text = sellerModel.location
         if (sellerModel.profileImgUrl != null)
             Glide.with(this@DetailActivity).load(sellerModel.profileImgUrl).circleCrop().into(binding.imgUserPicture)
     }
 
-    private fun initLikedInfo() {
-        if (marketModel.likedUserList == null || buyerModel == null) return
+    private fun updateLikedInfo() {
+        if (marketModel.likedUserList == null || buyerModel == null) {
+            "pass init Liked Info = marketModel.linkedUserList? = ${marketModel.likedUserList} // buyterMode? = $buyerModel".logD()
+            return
+        }
 
         val myId = buyerModel!!.id
         val likedUserList = marketModel.likedUserList!!
@@ -114,35 +129,44 @@ class DetailActivity : BaseActivity() {
 
     fun onFavoriteBtnClick() {
         if (buyerModel == null) {
-            "비회원은 좋아요를 할 수 없습니다.\n회원 가입 후 이용해 주세요.".showShortToast(this@DetailActivity)
+            "비회원은 좋아요를 할 수 없습니다.\n회원 가입 후 이용해 주세요.".apply {
+                showShortToast(this@DetailActivity)
+                logD()
+            }
             return
         } else if (buyerModel!!.id == sellerModel.id) {
-            "내가 업로드한 게시물에는 좋아요를 할 수 없습니다.".showShortToast(this@DetailActivity)
+            "내가 업로드한 게시물에는 좋아요를 할 수 없습니다.".apply {
+                showShortToast(this@DetailActivity)
+                logD()
+            }
             return
         }
-        if (marketModel.likedUserList == null) return
 
         val myId = buyerModel!!.id
-        var newLikeCnt = (marketModel.likeCnt ?: 0)
-        val likedUserList = marketModel.likedUserList as MutableList
+        val likedUserList = (marketModel.likedUserList ?: mutableListOf()) as MutableList<String>
         val docRefMarket = dbAdapter.marketDB.document(marketModel.id)
+        val isAdd: Boolean // 좋아요 설정 true, 해제 false
 
         if (!likedUserList.contains(myId)) {
-            newLikeCnt++
+            isAdd = true
             likedUserList.add(myId)
-            binding.imgFavorite.setImageResource(R.drawable.ic_baseline_favorite_24)
         } else {
-            if (newLikeCnt > 0) newLikeCnt--
             likedUserList.remove(myId)
-            binding.imgFavorite.setImageResource(R.drawable.ic_baseline_favorite_border_24)
+            isAdd = false
         }
-        binding.txtLikeCnt.text = newLikeCnt.getPriceCommaFormat()
-
         // TODO : Check Multiple Update Available
-        docRefMarket.update("likeCnt", newLikeCnt, "likedUserList", likedUserList)
-//            collectionRef.document(marketModel.id).update("likeCnt", newLikeCnt)
-//            collectionRef.document(marketModel.id).update("likedUserList", likedUserList)
+        docRefMarket.update("likedUserList", likedUserList).addOnCompleteListener {
+            "update LikeCnt ${marketModel.id} / ${marketModel.title} :: success? = ${it.isSuccessful}"
+            "좋아요를 눌렀습니다.".showShortToast(this@DetailActivity)
+            binding.txtLikeCnt.text = likedUserList.size.getPriceCommaFormat()
+            binding.imgFavorite.setImageResource(if (isAdd) R.drawable.ic_baseline_favorite_24 else R.drawable.ic_baseline_favorite_border_24)
+            CoroutineScope(Dispatchers.IO).launch {
+                marketModel = dbAdapter.getMarketModel(marketModel.id) ?: return@launch
+                updateUI()
+            }
+        }
     }
+
 
     fun onGoChatBtnClick() {
         if (buyerModel == null) {

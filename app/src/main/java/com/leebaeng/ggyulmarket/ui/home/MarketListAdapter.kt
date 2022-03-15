@@ -45,7 +45,7 @@ class MarketListAdapter(val onItemClickListener: (MarketModel) -> Unit) : ListAd
             }
 
             setSubInfo(binding.layoutTalkCount, binding.txtTalkCount, model.talkCnt)
-            setSubInfo(binding.layoutLikeCount, binding.txtLikeCount, model.likeCnt)
+            setSubInfo(binding.layoutLikeCount, binding.txtLikeCount, model.likedUserList?.size)
 
             if (!model.imgUrl.isNullOrEmpty() && model.imgUrl[0].isNotEmpty()) {
                 Glide.with(binding.root)

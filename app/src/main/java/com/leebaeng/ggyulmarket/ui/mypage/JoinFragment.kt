@@ -34,13 +34,13 @@ class JoinFragment : BaseFragment(R.layout.fragment_join) {
         val nickName = binding.edtNickname.text.toString()
         val address = binding.edtAddress.text.toString()
 
-        if (email.isEmpty() || pwd.isEmpty() || pwdChk.isEmpty() || nickName.isEmpty() || address.isEmpty()){
+        if (email.isEmpty() || pwd.isEmpty() || pwdChk.isEmpty() || nickName.isEmpty() || address.isEmpty()) {
             "모든 항목을 입력해 주세요.".showShortToast(binding.root.context)
             return
         } else if (pwd != pwdChk) {
             "입력한 비밀번호가 다릅니다.".showShortToast(binding.root.context)
             return
-        } else if(pwd.length < 6){
+        } else if (pwd.length < 6) {
             "6자리 이상의 비밀번호를 입력해야 합니다.".showShortToast(binding.root.context)
             return
         }
@@ -55,10 +55,12 @@ class JoinFragment : BaseFragment(R.layout.fragment_join) {
                                 id = dbAdapter.auth.currentUser!!.uid,
                                 nickName = nickName,
                                 location = address,
-                                profileImgUrl = null,
+                                profileImgUrl = null, // TODO : Image 업로드 및 URL 설정
                             )
-                            dbAdapter.userDB.document(dbAdapter.auth.currentUser!!.uid).set(dbAdapter.myUserModel!!)
-                            if (activity != null && activity is MainActivity) (activity as MainActivity).replaceFragment(Constants.FRAGMENT_ID_MY_PAGE)
+                            dbAdapter.userDB.document(dbAdapter.auth.currentUser!!.uid).set(dbAdapter.myUserModel!!).addOnCompleteListener {
+                                if (it.isSuccessful && activity != null && activity is MainActivity) (activity as MainActivity).replaceFragment(Constants.FRAGMENT_ID_MY_PAGE)
+                                else "회원 가입 실패 : ${it.exception}".showShortToast(binding.root.context)
+                            }
                         } else {
                             "회원 가입에 실패 했습니다.\n이메일과 패스워드를 확인해 주세요 (E-2)".showShortToast(binding.root.context)
                         }
