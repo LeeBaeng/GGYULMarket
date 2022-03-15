@@ -1,10 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
 
+    <data>
+        <variable
+            name="fragment"
+            type="com.leebaeng.ggyulmarket.ui.mypage.MyPageFragment" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#0000FF">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="logout"
+            android:onClick="@{fragment::onLogoutBtnClicked}"
+            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -31,5 +31,11 @@ class MyPageFragment : BaseFragment(R.layout.fragment_mypage) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding = FragmentMypageBinding.bind(view)
+        binding.fragment = this
+    }
+
+    fun onLogoutBtnClicked(view: View){
+        dbAdapter.auth.signOut()
+        (activity as MainActivity).replaceFragment(Constants.FRAGMENT_ID_LOGIN)
     }
 }
